@@ -20,10 +20,13 @@ function App() {
 
   useEffect(()=>{
       function onConnect () {
+        console.log("Client-connected")
         setIsConnected(true);
       }
 
       function onDisconnect() {
+        console.log("Client-disconnected")
+
         setIsConnected(false);
 
       }

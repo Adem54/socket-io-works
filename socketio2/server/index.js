@@ -19,14 +19,40 @@ const io = new Server(httpServer , {
 })
 
 //Server tarafinda clienttan gonderilen emmit leri almak icin burda dinlememiz gerekiyor dinlemek icin .on kullaniriz 
+//Socket server kendisine baglanan, abone olan, her bir user a client a farkli bir id atamasi yapiyor
 io.on("connection", (socket)=>{
-    console.log("Bir kullanici socket sunucsuna baglandi!");
-    console.log("SOCKET-ID: ", socket.id);
+    console.log(`User connected  ${socket.id}`);
 
-    io.on("disconnect", ()=>{
-        console.log("Kullanici-socket.io baglantisini kaybetti, ayrildi!!")
+//bur id veya roomnumber verilir, ve socket-server bunu dinliyor ve hangi oda numarasijna kim dahil olmus onu dinlioyr burda, front-end den spesifk room-number gonderilecek onu bekliyor....
+    socket.on("join_room", (data)=>{
+        socket.join(data);
     })
+
+
+    //!send_message i dinleme-listening ve -receive_message i bir oda icinde yapabukne islemi
+
+    socket.on("send_message", (data)=>{
+        socket.to(data.room).emit("receive_message", data);
+        //socket.to ile mesajin spesifik olarak nerye, hanig gruba gonderilecegini belirtmek icin kullaniliyor, ve de spesifk odaya alinan mesaj, sonrasinda da emit ile o oda daki tum kullaniclara receive_message eventi uzerinden emmit edilmis oluyor
+    })
+
+    //Dikkat edelim connection icerisinde alabiliyoruz biz, client taraindan emit edilen yani gonderilen, mesaji..
+    //Ama socket-server tamam aldi bu mesaji client in birinden veya farkli farkli browser lardan socket-io ya baglanan clientlardan ama herhangi birinden aldigi, mesaji nasil ayni anda, socket-io ya abone olmus, baglanmis tum clientlara iletecek, yani emit edecek....
+    socket.on("send_message", (data)=>{
+        console.log(`message is listening:  ${data.message}`)
+        //broadcast(yayin, duyurmak, nesretmek)
+        //broadcast ile  herkese birseyler gonermemize izin veriyor, yayin yapmak gibi, kendimz haricindeki herkese birseyler gonderebiliyhoruz 
+        //bu sekilde biz bizim disimizdaki tum clientlarin bize gonderidgi mesajlarin diger her bir client in yazilan herseyi almalari icin kullanacaklari event - receive_message , ama dikkat edelim, burda diger clientlar tarafindan gonderilen tum mesajlar
+        //Simdi front-end e gidip socket-server in mesaji aldiktan sonra, mesaji broadcast.emit ile tum clientlara duyurdugu event i fornt-end de kullanarak ayni anda, real-time sekilde yazilan tum mesajlar tum clientlara aninda ve a yni anda ulascaktir
+        socket.broadcast.emit("receive_message", data)
+        //Clientlar bu methodu-event i kullanarak anlik olarak herhangi bir clienttan  yazilan mesajlari gorebileceklerdir
+    })
+
+   
 })
+  //Her bir sayfa refresh edildiginde yeni den baglanti kuruluyor socket-io ile ve socket-server refresh yapilan client a y eni bir uniq id atamasi yapiyor...Ayrica da her bir farkli client icinde uniq-id atamasi yapiyor
+  //Yani socket-server kendisine kac kez baglanti yapildigi yani bu baglanti dedgimz client tarafinda   const socket = io.connect(serverURL); her syafa yenilendiginde bu io.connect(serverURL) yazildigindan hemen algiliyor....
+
 
 //http://localhost:3002/test bu sekilde normal httpserver imizn calisip calismadigini gorebiliriz
 app.get("/test", (req,res)=>{

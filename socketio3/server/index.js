@@ -23,6 +23,24 @@ const io = new Server(httpServer , {
 //Burdaki 2.parametredeki socket uzerinrden her bir kullanici icin, 1 uniq id verilir...
 io.on("connection", (socket)=>{
     console.log(`user connected: ${socket.id}`);
+
+    //!Oncelikle suna dikkat edelim ki, biz dinleme, reflect(yani clienttan buraya, socket-server a emit edilen, data yi once dineleme hemen ardindan da tum clientlara broadcast yapma yani yayinlama, veya emit etme..islemlerini ve de disconnect i dinleme  yi de biz yine nerde yapiyoruz, connection event i icerisindeki callback icinde yaparz , cunku connection event inin parametresine gelen socket objesi ile yapariz bu islemleri)
+    socket.on("join_room", (data)=>{//Burda, join_room eventinin clientta emit ettigi method un 2.paramtresinde gonderilen data dir bu data
+        const { username, room } = data;
+        socket.join(room);
+        console.log(`${username}  user with ID: ${socket.id} joined room: ${room}`)
+    })
+
+    //!send_message event ini dinle diyoruz...ve bu event i biz clienttan olusturulmasini bekliyoruz
+    socket.on("send_message", (data)=>{
+        console.log("data-send_message: ", data);
+    })
+
+
+    //baglanti kayboldugunda, yani kullanici cikis yapti veya... socket-server i kapatmasi icin, baglantiyi koparmasi icin yapiyoruz
+    socket.on("disconnect", ()=>{
+        console.log("User disconnected: ", socket.id )
+    })
 })
 
 

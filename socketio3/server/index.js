@@ -34,6 +34,13 @@ io.on("connection", (socket)=>{
     //!send_message event ini dinle diyoruz...ve bu event i biz clienttan olusturulmasini bekliyoruz
     socket.on("send_message", (data)=>{
         console.log("data-send_message: ", data);
+        //!Simdi burda datayi aldik...cok iyi burasi socket-server. Bundan sonrasi ise, bu data socket-serverdan diger bu server a abone olan, veya bu socket server a connection i olan tum clientlara nasil ayni anda, aninda gonderilecek!!!!!
+        //Artk listening yaparak, front-end den emit edilen,gonderilen bir mesaji, action i socket server da socket.on("send_message") ile dinleyerek aliyoruz..Bundan sonra sira, artik socket-io dan tum diger clientlara emmit etme ve ffront-endeki digeer clientlarin listen pozisiyonunda olmalaari...
+
+        socket.to(data.room).emit("receive_message", data);
+        //!Burda bir onemli nokta da su ki, bizim bir room numberimiz var, ve biz sadece o odadaki clientlarin bu mesjalari okumasini istiyrouz..yani bircok kullanicimz socket-io ya baglanmis olabilri ama hepsi bu mesajlari alamamalari gerekir..
+        //!Biz secificlestirecegimz zaman, bu sekilde o zaman socket.to(data.room).emit("receive_message", (data)= diyoruz ki bu oda numarasindakilere emit et...demis oluyoruz..
+        //!Ama burda sunu da anlamaliyiz, ki, mesaji front-endden yaziop emit eden client, haric diger tum kullanicilara mesaj gidiyor, cunku zaten o kullanici kendi mesajini yazmis, neden kendi yazdigi mesaj kendisine bir kez daha socket-io dan gelsin, iste ondan dolayi...mesaji gonderen,emit eden kullanici haric diger tum kullanicilara emit ediliyor socket-io dan....Ama socket-io da yazilan hersey toplaniyor....
     })
 
 

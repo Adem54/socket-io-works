@@ -35,8 +35,8 @@ input.addEventListener("input", function(event){
 btnSendMsg.addEventListener("click", function(event)
 {
     console.log("click--msg- msgText", msgText)
-    socket.emit("send-message", {name:"adem",
-surname:"erbas",msg:msgText});
+/*    socket.emit("send-message", {name:"adem",
+surname:"erbas",msg:msgText}); */
     input.value = "";
 })
 

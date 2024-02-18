@@ -1,4 +1,30 @@
 <?php 
+
+require '../../vendor/autoload.php';
+
+use ElephantIO\Client;
+use ElephantIO\Engine\SocketIO\Version2X;
+
+$client = new Client(new Version2X('http://localhost:5000'));
+$client->initialize();
+$client->emit('send-message', ['name'=>'zeynep', 'surname'=>'erbas']);
+$client->close();
+
+
+//Burasi backend, php sayfasidir ve buranin calismasi icin bizim php index.php ile ya da direk sayfayi localserver dan acarak calistirmamiz gerekiyor
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
 
 1-digitalocean da server ac(biz lokal server da calisacagiz)
@@ -8,6 +34,11 @@
 5-client da socket i dinlemeye basla
 6-backend den socket e data gonder
 7-clientte da gelen data yi isle
+
+
+
+
+
 
 !Biz burda daha degisik bir praktise yapip, backendden data yi socket-io ya gonderecegiz ordan da data yi client a gonderecegiz..yani data yi clienttan alip socket e degil de .php den yani  backendden socket-io ya data gonderecegiz
 

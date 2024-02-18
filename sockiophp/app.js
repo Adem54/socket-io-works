@@ -13,7 +13,7 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket)=>{
     console.log(`User conenected to ${socket.id}`);
-
+//!php(backend) den socket-server a , socket-server dan da client-frontend e, client sadece dinleyecek...gelen mesaji alacak
     socket.on("send-message", data=>{
         console.log(`send-message-data: ${JSON.stringify(data)}`);
         io.emit("messages", data);//clienttan gelen mesaj data sini da al diger tum bu socket i dinleyen clientlara godner demis oluyoruz...

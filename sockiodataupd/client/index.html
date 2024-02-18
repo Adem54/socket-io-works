@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <button id="button" style="padding:.4rem 1rem; margin:2rem; background-color: aqua; border:none; border-radius: .2rem; border:1px solid; cursor: pointer; font-size: 1.2rem;">
+        <span id="likes">0</span>
+    </button>
+    <script type="module">
+        import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
+      
+        const socket = io("http://127.0.0.1:5001");
+
+        let count = 0;
+        socket.on("connect", ()=>{
+            console.log("Connected-socket in client-side")
+        })
+
+        const btn = document.querySelector("#button");
+        const likes = document.getElementById("likes");
+
+        btn.addEventListener("click", (event)=>{
+            //Increment counter by 1 
+            console.log("clicked:")
+            socket.emit("liked");//count un artma islemini biz, socket-server tarafinda yapacagiz
+        
+        })
+
+        socket.on("likeupdate", (count)=>{
+            console.log("count-is listening from-socket..", count);
+            likes.textContent = count;
+        })
+      </script>
+</body>
+</html>

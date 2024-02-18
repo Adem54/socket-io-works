@@ -10,6 +10,7 @@ import { io } from "socket.io-client";
 
 
 function App() {
+  const [ notifications, setNotifications ]=useState([]);
   const [username, setUsername] = useState("");
   const [user, setUser ] = useState("");
 
@@ -18,16 +19,18 @@ function App() {
   console.log("user: ", user);
   console.log("username: ", username);
 
-  //useEffect kullaniyoirz cunku 1 kez baglanacagiz
+  //useEffect kullaniyoirz cunku 1 kez baglanacagiz, ilk sayfa acildiginda baglansin...diyoruz...bu onemli...
   useEffect(()=>{
     const socservURL = "http://localhost:3005";
     const socket = io.connect(socservURL);
+    console.log("socketttt-App.js: ", socket);
     //Burda socket in kendine ait uniq id si vardir
     setMySocket(socket);
     
   },[])
 
   //!Burda ilk olarak sayfa yi acip da kullanici ismini yazacak, ve biz o kullanici ismini socket-server a gondermis olacagiz..VE username leri kaydedecigiz ki onlineuser lar i array icerisinde tutmus olacagiz bu sekilde
+  //Her yeni username verisii girildiginde socket-server a o username gonderilebilsin...diye dependency array icine tetiklnmesini hangi deger degistiginde isiyorsk onlari girerirz ve burda da kullanicilari giriyoruz ki, socket-server da online kullaniclar olmali...ve o online kullanicilar arasindan kullanicilar birbirlerini bulacaklardir
   useEffect(()=>{
       mySocket?.emit("newUser", user);
   },[mySocket, user])
@@ -60,10 +63,10 @@ function App() {
       {user ?  
       ( 
         <>
-          <Navbar socket={ mySocket }/>
+          <Navbar mySocket={ mySocket }  notifications={notifications}  setNotifications={setNotifications}/>
           {
             posts.map((post)=>{
-              return <Card key={post.id} post={post} socket={mySocket} user={user} />
+              return <Card key={post.id} post={post} mySocket={mySocket} user={user} notifications={notifications} />
             })
           }
           <span className="username">{user}</span>
@@ -83,3 +86,4 @@ function App() {
 }
 
 export default App;
+//!Uygulamayi calistiririken suna dikkat edelim, giris yaparken posts data sinda ki isimlerin ayni sekilde girmeliyiz... john, monica diye cunku biz bu 2 kullanici arasinda gecen like yapma islemin simule ettik

@@ -3,7 +3,8 @@ import { Server } from "socket.io";
 
 const io = new Server( { 
     cors: {
-        origin:"http://localhost:3000",
+         origin:"http://localhost:3000",
+        //origin:"*",
         methods: ["GET", "POST"],
     }
 });
@@ -30,23 +31,35 @@ const removeUser = (socketId) => {
     onlineUsers = onlineUsers.filter(user=>user.socketId !== socketId);
 }
 
-const getUser = (username) => onlineUsers.find(user.username ===  username);
+const getUser = (username) => onlineUsers.find(user=>user.username ===  username);
 
 io.on("connection", (socket) => {
   // ...
   console.log("Someone has connected to socket.io  id: ", socket.id);
 
     socket.on("newUser", username=>{
-       
+       console.log("newUser:server: ", username);
         //!Bizim socketid yi client dan gondermemiz e gerek yok cunku zaten socket-server kendisine kimin baglandigini otomatik olarak alabiliyor
         addNewUser(username, socket.id); 
+        console.log("onlineUsers-addNewUser: ", onlineUsers);
     })
 
     //Like butonna tiklandignda socketserver a data yi gonderirken, kullanci kendi username ini sonra, kime gonderiyorsa daha dogrusu kimin postuna tiklamis ise onun username ini ve de tikladigi interaction ne ise onu(heart..) gondermesi gerekiyor ki, sokcet-io data yi aldigi gibi hedef clienta aninda haber verebilsin...COOK ONEMLI
-    socket.on("send_notification", ({senderName, receiverName, type})=>{
+    socket.on("sendNotification", ({senderName, receiverName, type})=>{
+        console.log("send_notification-serverside-receivarName: ", receiverName);
+        console.log("onlineUsers_: ", onlineUsers);
         const receiver = getUser(receiverName);
+        console.log("send_notification-serverside-receiver", receiver);
+
         //!Spesifik kullaniciya tekrardan gelen, like islemini aninda gonderiyoruz...COOOK ONEMLI
-        io.to(receiver.socketId).emit("get_notification", { senderName, type });
+        if (receiver) { // Check if receiver exists
+            console.log("getNotification- socket-server-senderName:", senderName);
+            console.log("getNotification- socket-server-type:", type);
+            io.to(receiver.socketId).emit("getNotification", { senderName, type });
+        } else {
+            console.log(`Receiver ${receiverName} not found.`);
+        }
+      
     })
 
 
